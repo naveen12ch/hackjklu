@@ -689,6 +689,106 @@
                 width: 100%;
             }
         }
+
+        /* NEW CHART STYLES */
+        .home-header {
+            margin-bottom: 32px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-top: 8px;
+        }
+
+        .chart-card-full {
+            background: var(--bg-white);
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 32px;
+        }
+
+        .chart-header-full {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
+        }
+
+        .chart-header-full h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .chart-subtitle-text {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-btn {
+            padding: 8px 16px;
+            border: 1px solid #E5E7EB;
+            background: var(--bg-white);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-light);
+        }
+
+        .chart-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .chart-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chart-canvas-wrapper {
+            position: relative;
+            height: 300px;
+            margin-bottom: 24px;
+        }
+
+        .chart-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .chart-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -731,16 +831,40 @@
         <main class="main-content">
             <!-- HOME SECTION -->
             <div id="home-section" class="section active">
-                <div class="time-display">
-                    <div class="time-card">
-                        <div class="time-value" id="current-time">--:--</div>
-                        <div class="time-label">
-                            <div class="time-label-day" id="current-day">Monday</div>
-                            <div class="time-label-date" id="current-date">March 13, 2026</div>
+                <div class="home-header">
+                    <h1 class="content-header">Home</h1>
+                    <p class="header-subtitle">Welcome back! Here's your financial overview.</p>
+                </div>
+
+                <!-- SPENDING TREND CHART -->
+                <div class="chart-card-full">
+                    <div class="chart-header-full">
+                        <div>
+                            <h3>Spending Trend (Last 7 Days)</h3>
+                            <p class="chart-subtitle-text">Daily expense tracking</p>
+                        </div>
+                        <div class="chart-controls">
+                            <button class="chart-btn active">7D</button>
+                            <button class="chart-btn">30D</button>
+                            <button class="chart-btn">90D</button>
                         </div>
                     </div>
-                    <div style="flex: 1;">
-                        <div class="content-header">Home</div>
+                    <div class="chart-canvas-wrapper">
+                        <canvas id="spendingTrendChart"></canvas>
+                    </div>
+                    <div class="chart-stats">
+                        <div class="chart-stat-item">
+                            <span class="stat-label">Average Daily</span>
+                            <span class="stat-amount">₹350</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="stat-label">Highest Day</span>
+                            <span class="stat-amount">₹720</span>
+                        </div>
+                        <div class="chart-stat-item">
+                            <span class="stat-label">Total Spent</span>
+                            <span class="stat-amount">₹2,450</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1195,8 +1319,94 @@
             event.target.reset();
         }
 
+        // Initialize Spending Trend Chart
+        function initSpendingTrendChart() {
+            const ctx = document.getElementById('spendingTrendChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [
+                            {
+                                label: 'Daily Spending',
+                                data: [450, 320, 580, 380, 720, 290, 510],
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointBackgroundColor: '#10B981',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointHoverRadius: 8,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    font: { size: 13, weight: 600 },
+                                    color: '#1F2937',
+                                    usePointStyle: true,
+                                    padding: 20
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(31, 41, 55, 0.9)',
+                                padding: 12,
+                                titleFont: { size: 13, weight: 600 },
+                                bodyFont: { size: 12 },
+                                borderColor: '#10B981',
+                                borderWidth: 1,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return '₹' + context.parsed.y;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 800,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₹' + value;
+                                    },
+                                    font: { size: 12 },
+                                    color: '#6B7280'
+                                },
+                                grid: {
+                                    color: 'rgba(107, 114, 128, 0.1)',
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 12 },
+                                    color: '#6B7280'
+                                },
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
         updateTime();
         setInterval(updateTime, 1000);
+        initSpendingTrendChart();
     </script>
 </body>
 </html>
